@@ -38,6 +38,7 @@ class ASGIApp:
         })
         uvicorn.run(app, '127.0.0.1', 5000)
     """
+
     def __init__(self, engineio_server, other_asgi_app=None,
                  static_files=None, engineio_path='engine.io',
                  on_startup=None, on_shutdown=None):
@@ -54,7 +55,7 @@ class ASGIApp:
 
     async def __call__(self, scope, receive, send):
         if scope['type'] in ['http', 'websocket'] and \
-                scope['path'].startswith(self.engineio_path):
+                self.engineio_path in scope['path']:
             await self.engineio_server.handle_request(scope, receive, send)
         else:
             static_file = get_static_file(scope['path'], self.static_files) \
@@ -223,6 +224,7 @@ class WebSocket(object):  # pragma: no cover
     This wrapper class provides an asgi WebSocket interface that is
     somewhat compatible with eventlet's implementation.
     """
+
     def __init__(self, handler, server):
         self.handler = handler
         self.asgi_receive = None
